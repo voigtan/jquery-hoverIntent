@@ -43,7 +43,7 @@
 		};
 		// A private function for comparing current and previous mouse position
 		var compare = function(ev,ob) {
-			ob.hoverIntent_t = clearTimeout(ob.hoverIntent_t);
+			clearTimeout(ob.hoverIntent_t);
 			// compare mouse positions to see if they've crossed the threshold
 			if ( ( Math.abs(pX-cX) + Math.abs(pY-cY) ) < cfg.sensitivity ) {
 				// set hoverIntent state to true (so mouseOut can be called)
