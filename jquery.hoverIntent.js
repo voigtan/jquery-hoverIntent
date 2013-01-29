@@ -4,7 +4,7 @@
 * to see if the user's mouse has slowed down (beneath the sensitivity
 * threshold) before firing the onMouseOver event.
 * 
-* hoverIntent r6 // 2011.02.26 // jQuery 1.5.1+
+* hoverIntent r7 // 2013.01.29 // jQuery 1.7.0+
 * <http://cherne.net/brian/resources/jquery.hoverIntent.html>
 * 
 * hoverIntent is currently available for use in all personal or commercial 
@@ -18,9 +18,10 @@
 * $("ul li").hoverIntent({
 *	sensitivity: 7, // number = sensitivity threshold (must be 1 or higher)
 *	interval: 100,   // number = milliseconds of polling interval
-*	over: showNav,  // function = onMouseOver callback (required)
+*	over: showNav,  // function = onMouseOver callback
 *	timeout: 0,   // number = milliseconds delay before onMouseOut function call
-*	out: hideNav    // function = onMouseOut callback (required)
+*	out: hideNav    // function = onMouseOut callback
+*	selector: 'selector' // string = CSS-Selector to do a delegate (Optional)
 * });
 * 
 * @param  mouseover  onMouseOver function || An object with configuration options
@@ -90,10 +91,11 @@
 		};
 
 		// bind the function to the two event listeners
-		if(cfg.selector !== null) {
-			return this.on('mouseenter mouseleave', cfg.selector, handleHover).bind("over", cfg.selector, cfg.over).bind("out", cfg.selector, cfg.out);
-		}
-		return this.bind('mouseenter mouseleave', handleHover).bind("over", cfg.over).bind("out", cfg.out);
+		return this.on({
+			'mouseenter mouseleave': handleHover,
+			'over': cfg.over,
+			'out': cfg.out
+		}, cfg.selector);
 	};
 	// default configuration options
 	$.fn.hoverIntent.default_options = {
@@ -102,6 +104,6 @@
 		timeout: 0,
 		out: $.noop,
 		over: $.noop,
-		cfg.selector: null
+		selector: null
 	};
 })(jQuery);
