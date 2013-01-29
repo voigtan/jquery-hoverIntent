@@ -90,7 +90,7 @@
 		};
 
 		// bind the function to the two event listeners
-		return this.bind('mouseenter mouseleave', handleHover).bind("over", cfg.over).bind("out", cfg.out);
+		return cfg.selector === null ? this.bind('mouseenter',handleHover).bind('mouseleave',handleHover) : this.bind('mouseenter mouseleave', handleHover).bind("over", cfg.over).bind("out", cfg.out);
 	};
 	// default configuration options
 	$.fn.hoverIntent.default_options = {
@@ -98,6 +98,7 @@
 		interval: 100,
 		timeout: 0,
 		out: $.noop,
-		over: $.noop
+		over: $.noop,
+		selector: null
 	};
 })(jQuery);
