@@ -13,6 +13,7 @@
 * 
 * // basic usage (just like .hover) receives onMouseOver and onMouseOut functions
 * $("ul li").hoverIntent( showNav , hideNav );
+* $("ul li").hoverIntent( toggleNav );
 * 
 * // advanced usage receives configuration object only
 * $("ul li").hoverIntent({
@@ -68,9 +69,9 @@
 			}
 		};
 		var trigger = function(ev, ob, eventName, cb) {
-			var event = $.Event(event + ".hoverIntent", ev);
-			ob.hoverIntent_s = eventName == 'mouseenter';
-			$(ob).unbind("mousemove", track).bind(eventName + ".hoverIntent", cb).trigger(event).unbind(eventName + ".hoverIntent", cb);
+			var event = $.Event(event + '.hoverIntent', ev);
+			ob.hoverIntent_s = eventName === 'mouseenter';
+			$(ob).off('mousemove', track).one(eventName + '.hoverIntent', cb).trigger(event);
 		};
 		// A private function for delaying the mouseOut function
 		var delay = function(ev,ob) {
@@ -86,12 +87,12 @@
 			// cancel hoverIntent timer if it exists
 			clearTimeout(ob.hoverIntent_t);
 
-			if (e.type === "mouseenter") {
+			if (e.type === 'mouseenter') {
 				// set "previous" X and Y position based on initial entry point
 				pX = ev.pageX;
 				pY = ev.pageY;
 				// update "current" X and Y position based on mousemove
-				$(ob).bind("mousemove", track);
+				$(ob).on('mousemove', track);
 				// start polling interval (self-calling timeout) to compare mouse coordinates over time
 				if (!ob.hoverIntent_s) {
 					ob.hoverIntent_t = setTimeout(function(){
@@ -100,7 +101,7 @@
 				}
 			} else {
 				// unbind expensive mousemove event
-				$(ob).unbind("mousemove", track);
+				$(ob).off('mousemove', track);
 				// if hoverIntent state is true, then call the mouseOut function after the specified delay
 				if (ob.hoverIntent_s) {
 					ob.hoverIntent_t = setTimeout(function(){
