@@ -36,7 +36,7 @@
 		// pX, pY = previous X and Y position of mouse, set by mouseover and polling interval
 		var cX, cY, pX, pY;
 		// override configuration options with user supplied object
-		var cfg = $.extend({ }, $.fn.hoverIntent.default_options, mouseout ? { over: mouseover, out: mouseout } : mouseover );
+		var cfg = $.extend({ }, $.fn.hoverIntent.default_options, $.isPlainObject(mouseover) ? mouseover : mouseout ? { over: mouseover, out: mouseout } : {});
 		// A private function for getting mouse position
 		var track = function(ev) {
 			cX = ev.pageX;
