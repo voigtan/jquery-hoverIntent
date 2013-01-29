@@ -36,31 +36,31 @@
 		// cX, cY = current X and Y position of mouse, updated by mousemove event
 		// pX, pY = previous X and Y position of mouse, set by mouseover and polling interval
 		var cX, cY, pX, pY;
+		var options = {
+			sensitivity: 7,
+			interval: 100,
+			timeout: 0,
+			out: $.noop,
+			over: $.noop,
+			selector: null
+		};
 		// override configuration options with user supplied object
-		var cfg = $.extend({ }, {
-				sensitivity: 7,
-				interval: 100,
-				timeout: 0,
-				out: $.noop,
-				over: $.noop,
-				selector: null
-			},
-			$.isPlainObject(mouseover) ? mouseover // Is an object config
-				: mouseout ? { over: mouseover, out: mouseout } // has a handlerIn, handlerOut
-					: { over: mouseover, out: mouseover }); // has a handleToggle
-
+		var cfg = $.extend({ }, options,
+			$.isPlainObject(mouseover)
+				? mouseover // Is an object config
+				: { over: mouseover, out: mouseout || mouseover }); // has a handlerIn, handlerOut or toggleHandle
 		// A private function for getting mouse position
 		var track = function(ev) {
 			cX = ev.pageX;
 			cY = ev.pageY;
 		};
 		// A private function for comparing current and previous mouse position
-		var compare = function(ev,ob) {
+		var compare = function(ev, ob) {
 			clearTimeout(ob.hoverIntent_t);
 			// compare mouse positions to see if they've crossed the threshold
 			if ( ( Math.abs(pX-cX) + Math.abs(pY-cY) ) < cfg.sensitivity ) {
 				// set hoverIntent state to true (so mouseOut can be called)
-				trigger(ev, ob, 'mouseenter', cfg.over);
+				trigger(ev, ob, cfg.over);
 			} else {
 				// set previous coordinates for next time
 				pX = cX; pY = cY;
@@ -68,15 +68,15 @@
 				ob.hoverIntent_t = setTimeout( function(){compare(ev, ob);} , cfg.interval );
 			}
 		};
-		var trigger = function(ev, ob, eventName, cb) {
-			var event = $.Event(event + '.hoverIntent', ev);
-			ob.hoverIntent_s = eventName === 'mouseenter';
-			$(ob).off('mousemove', track).one(eventName + '.hoverIntent', cb).trigger(event);
+		var trigger = function(ev, ob, cb) {
+			var event = $.Event(ev.type + '.hoverIntent', ev);
+			ob.hoverIntent_s = ev.type === 'mouseenter';
+			$(ob).off('mousemove', track).one(ev.type + '.hoverIntent', cb).trigger(event);
 		};
 		// A private function for delaying the mouseOut function
 		var delay = function(ev,ob) {
 			clearTimeout(ob.hoverIntent_t);
-			trigger(ev, ob, 'mouseleave', cfg.out);
+			trigger(ev, ob, cfg.out);
 		};
 		// A private function for handling mouse 'hovering'
 		var handleHover = function(e) {
