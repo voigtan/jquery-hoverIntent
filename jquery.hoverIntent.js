@@ -36,7 +36,8 @@
         var cfg = {
             interval: 100,
             sensitivity: 7,
-            timeout: 0
+            timeout: 0,
+            ignoreScroll: false
         };
 
         if ( typeof handlerIn === "object" ) {
@@ -48,14 +49,18 @@
         }
 
         // instantiate variables
+        // viewport = reference viewport for mouse position, either "page" (layout) or "client" (visual)
+        // X, Y = event properties used to get position of mouse
         // cX, cY = current X and Y position of mouse, updated by mousemove event
         // pX, pY = previous X and Y position of mouse, set by mouseover and polling interval
+        var viewport = cfg.ignoreScroll ? "client" : "page";
+        var X = viewport + "X", Y = viewport + "Y";
         var cX, cY, pX, pY;
 
         // A private function for getting mouse position
         var track = function(ev) {
-            cX = ev.pageX;
-            cY = ev.pageY;
+            cX = ev[X];
+            cY = ev[Y];
         };
 
         // A private function for comparing current and previous mouse position
@@ -91,21 +96,21 @@
             // cancel hoverIntent timer if it exists
             if (ob.hoverIntent_t) { ob.hoverIntent_t = clearTimeout(ob.hoverIntent_t); }
 
-            // if e.type == "mouseenter"
-            if (e.type == "mouseenter") {
+            // if e.type === "mouseenter"
+            if (e.type === "mouseenter") {
                 // set "previous" X and Y position based on initial entry point
-                pX = ev.pageX; pY = ev.pageY;
+                pX = ev[X]; pY = ev[Y];
                 // update "current" X and Y position based on mousemove
                 $(ob).on("mousemove.hoverIntent",track);
                 // start polling interval (self-calling timeout) to compare mouse coordinates over time
-                if (ob.hoverIntent_s != 1) { ob.hoverIntent_t = setTimeout( function(){compare(ev,ob);} , cfg.interval );}
+                if (ob.hoverIntent_s !== 1) { ob.hoverIntent_t = setTimeout( function(){compare(ev,ob);} , cfg.interval );}
 
                 // else e.type == "mouseleave"
             } else {
                 // unbind expensive mousemove event
                 $(ob).off("mousemove.hoverIntent",track);
                 // if hoverIntent state is true, then call the mouseOut function after the specified delay
-                if (ob.hoverIntent_s == 1) { ob.hoverIntent_t = setTimeout( function(){delay(ev,ob);} , cfg.timeout );}
+                if (ob.hoverIntent_s === 1) { ob.hoverIntent_t = setTimeout( function(){delay(ev,ob);} , cfg.timeout );}
             }
         };
 
