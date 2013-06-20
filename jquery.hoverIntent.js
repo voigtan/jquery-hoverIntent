@@ -53,9 +53,10 @@
         // X, Y = event properties used to get position of mouse
         // cX, cY = current X and Y position of mouse, updated by mousemove event
         // pX, pY = previous X and Y position of mouse, set by mouseover and polling interval
+        // scrolling = true if scrolled recently without moving the mouse, false otherwise
         var viewport = cfg.ignoreScroll ? "client" : "page";
         var X = viewport + "X", Y = viewport + "Y";
-        var cX, cY, pX, pY;
+        var cX, cY, pX, pY, scrolling = false;
 
         // A private function for getting mouse position
         var track = function(ev) {
@@ -79,6 +80,13 @@
                 ob.hoverIntent_t = setTimeout( function(){compare(ev, ob);} , cfg.interval );
             }
         };
+        
+        // A private function for detecting if the user is scrolling
+        var detectScroll = $.proxy(function() {
+         scrolling = true;
+         // set scrolling back to false after first mousemove
+         this.one({"mousemove.hoverIntent": function(){ scrolling = false;} }, cfg.selector);
+        }, this);
 
         // A private function for delaying the mouseOut function
         var delay = function(ev,ob) {
@@ -98,6 +106,8 @@
 
             // if e.type === "mouseenter"
             if (e.type === "mouseenter") {
+                // don't do anything while scrolling
+                if (scrolling) { return; }
                 // set "previous" X and Y position based on initial entry point
                 pX = ev[X]; pY = ev[Y];
                 // update "current" X and Y position based on mousemove
@@ -114,6 +124,8 @@
             }
         };
 
+        // listen for scroll event, if we want to ignore it
+        if (cfg.ignoreScroll) { $(window).scroll(detectScroll); }
         // listen for mouseenter and mouseleave
         return this.on({'mouseenter.hoverIntent':handleHover,'mouseleave.hoverIntent':handleHover}, cfg.selector);
     };
