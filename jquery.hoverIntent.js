@@ -125,7 +125,7 @@
         };
 
         // listen for scroll event, if we want to ignore it
-        if (cfg.ignoreScroll) { $(window).scroll(detectScroll); }
+        if (cfg.ignoreScroll) { $(window).on('scroll.hoverIntent', detectScroll); }
         // listen for mouseenter and mouseleave
         return this.on({'mouseenter.hoverIntent':handleHover,'mouseleave.hoverIntent':handleHover}, cfg.selector);
     };
